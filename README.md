@@ -4,9 +4,9 @@ Code made by Francisco Jesús Díaz Pellejero. Further explanation at pdf docume
 
 ## Compile
 To compile the entire project:
-	- Type make all
+	- make all
 
 ## Execute toroidal
-	- Type make test1
+	- make test1
 ## Execute hypercube
-	- Type make test2
+	- make test2
