@@ -12,6 +12,7 @@
 
 void send_by_rows(int rank, int side_length, double *min_number);
 void send_by_columns(int rank, int side_length, double *min_number);
+void compute_smallest(int rank, int n_numbers, double *min_number, int num_available);
 
 int main(int argc, char **argv){
 
@@ -24,17 +25,18 @@ int main(int argc, char **argv){
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     distribute_numbers(rank, size, &n_numbers, &num_available, buf);
-    compute_smaller(rank, n_numbers, buf, num_available);
-    if(rank == 0) printf("\n\n*************************AFTER COMPUTING SMALLER NUMBER********************\nThe smallest number is %.2f\n", buf[0]);
+    compute_smallest(rank, n_numbers, buf, num_available);
+    if(rank == 0) printf("\n\n*************************AFTER COMPUTING SMALLEST NUMBER********************\nThe smallest number is %.2f\n", buf[0]);
     MPI_Finalize();
     return EXIT_SUCCESS;
 }
 
-void compute_smaller(int rank, int n_numbers, double buf[], int num_available){
+
+void compute_smallest(int rank, int n_numbers, double *min_number, int num_available){
     print_message("*************PROPAGATION BETWEEN ROWS****************", rank);
-    if (num_available) send_by_rows((rank+1), sqrt(n_numbers), &buf[0]);
+    if (num_available) send_by_rows((rank+1), sqrt(n_numbers), min_number);
     print_message("*************PROPAGATION BETWEEN COLUMNS****************", rank);
-    if(num_available) send_by_columns((rank+1), sqrt(n_numbers), &buf[0]);
+    if(num_available) send_by_columns((rank+1), sqrt(n_numbers), min_number);
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
@@ -54,7 +56,7 @@ void send_by_rows(int rank, int side_length, double *min_number){
         
         MPI_Recv(buf, 1, MPI_DOUBLE, (source-1), MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-        if(buf[0] < *min_number) *min_number = buf[0];
+        if(*buf < *min_number) *min_number = *buf;
     }
 }
 
@@ -74,6 +76,6 @@ void send_by_columns(int rank, int side_length, double *min_number){
         
         MPI_Recv(buf, 1, MPI_DOUBLE, (source-1), MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-        if(buf[0] < *min_number) *min_number = buf[0];
+        if(*buf < *min_number) *min_number = *buf;
     }
 }
