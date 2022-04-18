@@ -45,9 +45,8 @@ void distribute_numbers(int rank, int size, int *n_numbers, int *num_available, 
         *num_available = 1;
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
-
     if(*num_available) printf("I'm process %d out of %d. My number is: %.2f\n", (rank+1), size, buf[0]);
+    MPI_Barrier(MPI_COMM_WORLD);
 }
 
 void send_numbers(double *num_array, int n_numbers){
